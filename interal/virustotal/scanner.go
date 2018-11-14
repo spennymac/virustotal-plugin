@@ -66,7 +66,11 @@ func NewScanner(api API, pollInterval time.Duration, requestsPerMinute uint) *Sc
 //Scan checks a digest from the provided scan message against the virustotal db
 func (s Scanner) Scan(scan ipc.Scan) (plugins.Result, error) {
 	<-s.limiter
-	logger := log.WithFields(log.Fields{"func": "ProcessScanMessage"})
+	logger := log.WithFields(log.Fields{"func": "Scan"})
+
+	logger.WithFields(log.Fields{
+		"scan": scan,
+	}).Warning("Fetching Report")
 
 	if len(scan.Digests) <= 0 {
 		logger.Error("no digests found")

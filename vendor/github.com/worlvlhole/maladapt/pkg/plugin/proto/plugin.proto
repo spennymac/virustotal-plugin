@@ -1,0 +1,27 @@
+syntax = "proto3";
+package proto;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+message Digest {
+    string algorithm = 1;
+    bytes hash = 2;
+}
+
+message ScanRequest {
+    string id = 1;
+    string filename = 2;
+    string location = 3;
+    repeated Digest digests = 4;
+}
+
+message ScanResponse {
+    google.protobuf.Timestamp time = 1;
+    string type = 2;
+    google.protobuf.Any details = 3;
+}
+
+service Plugin {
+    rpc Scan(ScanRequest) returns (ScanResponse);
+}

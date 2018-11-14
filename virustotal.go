@@ -1,23 +1,44 @@
 package main
 
 import (
+	"strings"
+	"log/syslog"
 	"net/http"
 
 	"github.com/spf13/viper"
-
-	"github.com/worlvlhole/virustotal-plugin/interal/virustotal"
-	"github.com/worlvlhole/maladapt/pkg/ipc"
+	log "github.com/sirupsen/logrus"
+	lSyslog "github.com/sirupsen/logrus/hooks/syslog"
+	"github.com/hashicorp/go-plugin"
+	
 	"github.com/worlvlhole/maladapt/pkg/plugin"
+	
+	"github.com/worlvlhole/virustotal-plugin/interal/virustotal"
 )
 
-type vt struct {
-	scanner *virustotal.Scanner
-}
 
-func newVT(cfg *viper.Viper) (*vt, error) {
-	vtCfg := virustotal.NewConfigurationFromViper(cfg)
+const (
+	envPrefix     = "MAL"
+)
+
+func main() {
+	//Setup Logger
+	log.SetFormatter(&log.JSONFormatter{})
+	hook, err := lSyslog.NewSyslogHook("", "", syslog.LOG_DEBUG, "virustotal")
+	if err != nil {
+		log.Error("could not setup syslog logger")
+	} else {
+		log.AddHook(hook)
+	}
+
+	log.Warning("Starting virustotal plugin")
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+	viper.SetEnvPrefix(envPrefix)
+	viper.AutomaticEnv()
+
+	vtCfg := virustotal.NewConfigurationFromViper(viper.GetViper())
 	if err := vtCfg.Validate(); err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	httpClient := http.DefaultClient
@@ -30,20 +51,14 @@ func newVT(cfg *viper.Viper) (*vt, error) {
 		vtCfg.RequestsPerMinute,
 	)
 
-	return &vt{scanner: scanner}, nil
-}
-
-func (v vt) Scan(scan ipc.Scan) (plugins.Result, error) {
-	return v.scanner.Scan(scan)
-}
-
-//NewPlugin creates the plugin to be used by the plugin module
-func NewPlugin() (plugins.Plugin, error) {
-	plugin, err := newVT(viper.GetViper())
-
-	if err != nil {
-		return nil, err
+	pluginMap := map[string]plugin.Plugin{
+		"scanner": &plugins.ScannerGRPCPlugin{Impl: scanner},
 	}
 
-	return plugin, nil
+	plugin.Serve(&plugin.ServeConfig{
+		HandshakeConfig: plugins.HandshakeConfig,
+		Plugins: pluginMap,
+		GRPCServer: plugin.DefaultGRPCServer,
+	})
+
 }
