@@ -1,0 +1,31 @@
+syntax = "proto3";
+package proto;
+
+import "google/protobuf/timestamp.proto";
+
+message Digest {
+    string algorithm = 1;
+    bytes hash = 2;
+}
+
+message ScanRequest {
+    string id = 1;
+    string filename = 2;
+    string location = 3;
+    repeated Digest digests = 4;
+}
+
+message AVScanResponse {
+    message AVScanResult {
+        int32 positives = 1;
+        int32 totalScans = 2;
+        bytes context = 3;
+    }
+    google.protobuf.Timestamp time = 1;
+    string type = 2;
+    AVScanResult result = 3;
+}
+
+service AVScannerPlugin {
+    rpc Scan(ScanRequest) returns (AVScanResponse);
+}

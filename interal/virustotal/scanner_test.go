@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/worlvlhole/maladapt/internal/digests"
+	"github.com/worlvlhole/maladapt/pkg/digests"
 	"github.com/worlvlhole/maladapt/pkg/ipc"
 	"github.com/worlvlhole/maladapt/pkg/plugin"
 )
