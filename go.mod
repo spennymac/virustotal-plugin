@@ -7,4 +7,3 @@ require (
 	github.com/worlvlhole/maladapt v0.0.0-20181113194227-f25dc0bd2fa8
 )
 
-replace github.com/worlvlhole/maladapt => ../../maladapt
