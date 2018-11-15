@@ -30,7 +30,7 @@ func main() {
 		log.AddHook(hook)
 	}
 
-	log.Warning("Starting virustotal plugin")
+	log.Info("Starting virustotal plugin")
 	replacer := strings.NewReplacer(".", "_")
 	viper.SetEnvKeyReplacer(replacer)
 	viper.SetEnvPrefix(envPrefix)
@@ -52,7 +52,7 @@ func main() {
 	)
 
 	pluginMap := map[string]plugin.Plugin{
-		"scanner": &plugins.ScannerGRPCPlugin{Impl: scanner},
+		"av_scanner": &plugins.AVScannerGRPCPlugin{Impl: scanner},
 	}
 
 	plugin.Serve(&plugin.ServeConfig{

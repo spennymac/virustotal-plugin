@@ -2,12 +2,15 @@ package plugins
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/google/uuid"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/google/uuid"
 	"github.com/hashicorp/go-plugin"
+	log "github.com/sirupsen/logrus"
+
 	"google.golang.org/grpc"
 
 	"github.com/worlvlhole/maladapt/pkg/digests"
@@ -48,12 +51,17 @@ var HandshakeConfig = plugin.HandshakeConfig{
 	MagicCookieValue: "hello",
 }
 
-// GRPCClient is an implementation of KV that talks over RPC.
-type GRPCClient struct{ client proto.PluginClient }
+//PluginMap defines the types of plugins supported
+var PluginMap = map[string]plugin.Plugin{
+	"av_scanner": &AVScannerGRPCPlugin{},
+}
+
+// AVScannerGRPCClient is an implementation of Plugin that talks over RPC.
+type AVScannerGRPCClient struct{ client proto.AVScannerPluginClient }
 
 //Scan impl plugin interface
-func (m *GRPCClient) Scan(scan ipc.Scan) (Result, error) {
-	
+func (a *AVScannerGRPCClient) Scan(scan ipc.Scan) (Result, error) {
+
 	logger := log.WithFields(log.Fields{"func": "Scan"})
 
 	digests := make([]*proto.Digest, len(scan.Digests))
@@ -69,11 +77,11 @@ func (m *GRPCClient) Scan(scan ipc.Scan) (Result, error) {
 		Id:       scan.ID.String(),
 		Filename: scan.Filename,
 		Location: scan.Location,
-		Digests:   digests,
+		Digests:  digests,
 	}
 
 	logger.WithField("request", req).Info("Sending scan request")
-	resp, err := m.client.Scan(context.Background(), &req)
+	resp, err := a.client.Scan(context.Background(), &req)
 
 	if err != nil {
 		return Result{}, err
@@ -84,22 +92,32 @@ func (m *GRPCClient) Scan(scan ipc.Scan) (Result, error) {
 		return Result{}, err
 	}
 
+	var context map[string]interface{}
+	err = json.Unmarshal(resp.Result.Context, &context)
+	if err != nil {
+		return Result{}, err
+	}
+
 	return Result{
-		Time:    time,
-		Type:    resp.Type,
-		Details: nil,
+		Time: time,
+		Type: resp.Type,
+		Details: VirusScanResult{
+			Positives:  int(resp.Result.Positives),
+			TotalScans: int(resp.Result.TotalScans),
+			Context:    context,
+		},
 	}, nil
 }
 
-// GRPCServer is the gRPC server that GRPCClient talks to.
-type GRPCServer struct {
+// AVScannerGRPCServer is the gRPC server that GRPCClient talks to.
+type AVScannerGRPCServer struct {
 	// This is the real implementation
 	Impl Plugin
 }
 
 //Scan impl of plugin interface
-func (m *GRPCServer) Scan(ctx context.Context,
-	req *proto.ScanRequest) (*proto.ScanResponse, error) {
+func (a *AVScannerGRPCServer) Scan(ctx context.Context,
+	req *proto.ScanRequest) (*proto.AVScanResponse, error) {
 
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
@@ -113,15 +131,24 @@ func (m *GRPCServer) Scan(ctx context.Context,
 	}
 
 	scan := ipc.Scan{
-		ID: id,
+		ID:       id,
 		Filename: req.Filename,
 		Location: req.Location,
-		Digests: digests,
+		Digests:  digests,
 	}
 
-	result, err := m.Impl.Scan(scan)
+	result, err := a.Impl.Scan(scan)
 	if err != nil {
 		return nil, err
+	}
+
+	if result.Type != VirusScan {
+		return nil, errors.New("invalid result type")
+	}
+
+	vsr, ok := result.Details.(VirusScanResult)
+	if !ok {
+		return nil, errors.New("invalid result type")
 	}
 
 	time, err := ptypes.TimestampProto(result.Time)
@@ -129,15 +156,24 @@ func (m *GRPCServer) Scan(ctx context.Context,
 		return nil, err
 	}
 
-	return &proto.ScanResponse{
-		Time:    time,
-		Type:    result.Type,
-		Details: nil,
+	context, err := json.Marshal(vsr.Context)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.AVScanResponse{
+		Time: time,
+		Type: result.Type,
+		Result: &proto.AVScanResponse_AVScanResult{
+			Positives:  int32(vsr.Positives),
+			TotalScans: int32(vsr.TotalScans),
+			Context:    context,
+		},
 	}, err
 }
 
-// ScannerGRPCPlugin is the implementation of plugin.GRPCPlugin so we can serve/consume this.
-type ScannerGRPCPlugin struct {
+// AVScannerGRPCPlugin is the implementation of plugin.GRPCPlugin so we can serve/consume this.
+type AVScannerGRPCPlugin struct {
 	// GRPCPlugin must still implement the Plugin interface
 	plugin.Plugin
 	// Concrete implementation, written in Go. This is only used for plugins
@@ -146,12 +182,12 @@ type ScannerGRPCPlugin struct {
 }
 
 //GRPCServer implements server
-func (p *ScannerGRPCPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
-	proto.RegisterPluginServer(s, &GRPCServer{Impl: p.Impl})
+func (p *AVScannerGRPCPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc.Server) error {
+	proto.RegisterAVScannerPluginServer(s, &AVScannerGRPCServer{Impl: p.Impl})
 	return nil
 }
 
 //GRPCClient implements client
-func (p *ScannerGRPCPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
-	return &GRPCClient{client: proto.NewPluginClient(c)}, nil
+func (p *AVScannerGRPCPlugin) GRPCClient(ctx context.Context, broker *plugin.GRPCBroker, c *grpc.ClientConn) (interface{}, error) {
+	return &AVScannerGRPCClient{client: proto.NewAVScannerPluginClient(c)}, nil
 }

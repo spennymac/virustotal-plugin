@@ -2,7 +2,6 @@ syntax = "proto3";
 package proto;
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/any.proto";
 
 message Digest {
     string algorithm = 1;
@@ -16,12 +15,17 @@ message ScanRequest {
     repeated Digest digests = 4;
 }
 
-message ScanResponse {
+message AVScanResponse {
+    message AVScanResult {
+        int32 positives = 1;
+        int32 totalScans = 2;
+        bytes context = 3;
+    }
     google.protobuf.Timestamp time = 1;
     string type = 2;
-    google.protobuf.Any details = 3;
+    AVScanResult result = 3;
 }
 
-service Plugin {
-    rpc Scan(ScanRequest) returns (ScanResponse);
+service AVScannerPlugin {
+    rpc Scan(ScanRequest) returns (AVScanResponse);
 }

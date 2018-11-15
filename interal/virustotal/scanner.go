@@ -70,7 +70,7 @@ func (s Scanner) Scan(scan ipc.Scan) (plugins.Result, error) {
 
 	logger.WithFields(log.Fields{
 		"scan": scan,
-	}).Warning("Fetching Report")
+	}).Info("Fetching Report")
 
 	if len(scan.Digests) <= 0 {
 		logger.Error("no digests found")

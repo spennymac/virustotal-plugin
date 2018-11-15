@@ -6,7 +6,6 @@ package proto
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import any "github.com/golang/protobuf/ptypes/any"
 import timestamp "github.com/golang/protobuf/ptypes/timestamp"
 
 import (
@@ -37,7 +36,7 @@ func (m *Digest) Reset()         { *m = Digest{} }
 func (m *Digest) String() string { return proto.CompactTextString(m) }
 func (*Digest) ProtoMessage()    {}
 func (*Digest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_plugin_0b098cad807ab7cb, []int{0}
+	return fileDescriptor_plugin_487726b37a91bb4d, []int{0}
 }
 func (m *Digest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Digest.Unmarshal(m, b)
@@ -85,7 +84,7 @@ func (m *ScanRequest) Reset()         { *m = ScanRequest{} }
 func (m *ScanRequest) String() string { return proto.CompactTextString(m) }
 func (*ScanRequest) ProtoMessage()    {}
 func (*ScanRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_plugin_0b098cad807ab7cb, []int{1}
+	return fileDescriptor_plugin_487726b37a91bb4d, []int{1}
 }
 func (m *ScanRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ScanRequest.Unmarshal(m, b)
@@ -133,56 +132,110 @@ func (m *ScanRequest) GetDigests() []*Digest {
 	return nil
 }
 
-type ScanResponse struct {
-	Time                 *timestamp.Timestamp `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
-	Type                 string               `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Details              *any.Any             `protobuf:"bytes,3,opt,name=details,proto3" json:"details,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+type AVScanResponse struct {
+	Time                 *timestamp.Timestamp         `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
+	Type                 string                       `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	Result               *AVScanResponse_AVScanResult `protobuf:"bytes,3,opt,name=result,proto3" json:"result,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
 }
 
-func (m *ScanResponse) Reset()         { *m = ScanResponse{} }
-func (m *ScanResponse) String() string { return proto.CompactTextString(m) }
-func (*ScanResponse) ProtoMessage()    {}
-func (*ScanResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_plugin_0b098cad807ab7cb, []int{2}
+func (m *AVScanResponse) Reset()         { *m = AVScanResponse{} }
+func (m *AVScanResponse) String() string { return proto.CompactTextString(m) }
+func (*AVScanResponse) ProtoMessage()    {}
+func (*AVScanResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_plugin_487726b37a91bb4d, []int{2}
 }
-func (m *ScanResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ScanResponse.Unmarshal(m, b)
+func (m *AVScanResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AVScanResponse.Unmarshal(m, b)
 }
-func (m *ScanResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ScanResponse.Marshal(b, m, deterministic)
+func (m *AVScanResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AVScanResponse.Marshal(b, m, deterministic)
 }
-func (dst *ScanResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ScanResponse.Merge(dst, src)
+func (dst *AVScanResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AVScanResponse.Merge(dst, src)
 }
-func (m *ScanResponse) XXX_Size() int {
-	return xxx_messageInfo_ScanResponse.Size(m)
+func (m *AVScanResponse) XXX_Size() int {
+	return xxx_messageInfo_AVScanResponse.Size(m)
 }
-func (m *ScanResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ScanResponse.DiscardUnknown(m)
+func (m *AVScanResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AVScanResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ScanResponse proto.InternalMessageInfo
+var xxx_messageInfo_AVScanResponse proto.InternalMessageInfo
 
-func (m *ScanResponse) GetTime() *timestamp.Timestamp {
+func (m *AVScanResponse) GetTime() *timestamp.Timestamp {
 	if m != nil {
 		return m.Time
 	}
 	return nil
 }
 
-func (m *ScanResponse) GetType() string {
+func (m *AVScanResponse) GetType() string {
 	if m != nil {
 		return m.Type
 	}
 	return ""
 }
 
-func (m *ScanResponse) GetDetails() *any.Any {
+func (m *AVScanResponse) GetResult() *AVScanResponse_AVScanResult {
 	if m != nil {
-		return m.Details
+		return m.Result
+	}
+	return nil
+}
+
+type AVScanResponse_AVScanResult struct {
+	Positives            int32    `protobuf:"varint,1,opt,name=positives,proto3" json:"positives,omitempty"`
+	TotalScans           int32    `protobuf:"varint,2,opt,name=totalScans,proto3" json:"totalScans,omitempty"`
+	Context              []byte   `protobuf:"bytes,3,opt,name=context,proto3" json:"context,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AVScanResponse_AVScanResult) Reset()         { *m = AVScanResponse_AVScanResult{} }
+func (m *AVScanResponse_AVScanResult) String() string { return proto.CompactTextString(m) }
+func (*AVScanResponse_AVScanResult) ProtoMessage()    {}
+func (*AVScanResponse_AVScanResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_plugin_487726b37a91bb4d, []int{2, 0}
+}
+func (m *AVScanResponse_AVScanResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AVScanResponse_AVScanResult.Unmarshal(m, b)
+}
+func (m *AVScanResponse_AVScanResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AVScanResponse_AVScanResult.Marshal(b, m, deterministic)
+}
+func (dst *AVScanResponse_AVScanResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AVScanResponse_AVScanResult.Merge(dst, src)
+}
+func (m *AVScanResponse_AVScanResult) XXX_Size() int {
+	return xxx_messageInfo_AVScanResponse_AVScanResult.Size(m)
+}
+func (m *AVScanResponse_AVScanResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_AVScanResponse_AVScanResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AVScanResponse_AVScanResult proto.InternalMessageInfo
+
+func (m *AVScanResponse_AVScanResult) GetPositives() int32 {
+	if m != nil {
+		return m.Positives
+	}
+	return 0
+}
+
+func (m *AVScanResponse_AVScanResult) GetTotalScans() int32 {
+	if m != nil {
+		return m.TotalScans
+	}
+	return 0
+}
+
+func (m *AVScanResponse_AVScanResult) GetContext() []byte {
+	if m != nil {
+		return m.Context
 	}
 	return nil
 }
@@ -190,7 +243,8 @@ func (m *ScanResponse) GetDetails() *any.Any {
 func init() {
 	proto.RegisterType((*Digest)(nil), "proto.Digest")
 	proto.RegisterType((*ScanRequest)(nil), "proto.ScanRequest")
-	proto.RegisterType((*ScanResponse)(nil), "proto.ScanResponse")
+	proto.RegisterType((*AVScanResponse)(nil), "proto.AVScanResponse")
+	proto.RegisterType((*AVScanResponse_AVScanResult)(nil), "proto.AVScanResponse.AVScanResult")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -201,91 +255,94 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// PluginClient is the client API for Plugin service.
+// AVScannerPluginClient is the client API for AVScannerPlugin service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type PluginClient interface {
-	Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error)
+type AVScannerPluginClient interface {
+	Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*AVScanResponse, error)
 }
 
-type pluginClient struct {
+type aVScannerPluginClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewPluginClient(cc *grpc.ClientConn) PluginClient {
-	return &pluginClient{cc}
+func NewAVScannerPluginClient(cc *grpc.ClientConn) AVScannerPluginClient {
+	return &aVScannerPluginClient{cc}
 }
 
-func (c *pluginClient) Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*ScanResponse, error) {
-	out := new(ScanResponse)
-	err := c.cc.Invoke(ctx, "/proto.Plugin/Scan", in, out, opts...)
+func (c *aVScannerPluginClient) Scan(ctx context.Context, in *ScanRequest, opts ...grpc.CallOption) (*AVScanResponse, error) {
+	out := new(AVScanResponse)
+	err := c.cc.Invoke(ctx, "/proto.AVScannerPlugin/Scan", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PluginServer is the server API for Plugin service.
-type PluginServer interface {
-	Scan(context.Context, *ScanRequest) (*ScanResponse, error)
+// AVScannerPluginServer is the server API for AVScannerPlugin service.
+type AVScannerPluginServer interface {
+	Scan(context.Context, *ScanRequest) (*AVScanResponse, error)
 }
 
-func RegisterPluginServer(s *grpc.Server, srv PluginServer) {
-	s.RegisterService(&_Plugin_serviceDesc, srv)
+func RegisterAVScannerPluginServer(s *grpc.Server, srv AVScannerPluginServer) {
+	s.RegisterService(&_AVScannerPlugin_serviceDesc, srv)
 }
 
-func _Plugin_Scan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AVScannerPlugin_Scan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ScanRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PluginServer).Scan(ctx, in)
+		return srv.(AVScannerPluginServer).Scan(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Plugin/Scan",
+		FullMethod: "/proto.AVScannerPlugin/Scan",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PluginServer).Scan(ctx, req.(*ScanRequest))
+		return srv.(AVScannerPluginServer).Scan(ctx, req.(*ScanRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Plugin_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Plugin",
-	HandlerType: (*PluginServer)(nil),
+var _AVScannerPlugin_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.AVScannerPlugin",
+	HandlerType: (*AVScannerPluginServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Scan",
-			Handler:    _Plugin_Scan_Handler,
+			Handler:    _AVScannerPlugin_Scan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "plugin.proto",
 }
 
-func init() { proto.RegisterFile("plugin.proto", fileDescriptor_plugin_0b098cad807ab7cb) }
+func init() { proto.RegisterFile("plugin.proto", fileDescriptor_plugin_487726b37a91bb4d) }
 
-var fileDescriptor_plugin_0b098cad807ab7cb = []byte{
-	// 293 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x91, 0xcf, 0x4e, 0x84, 0x30,
-	0x10, 0xc6, 0xc3, 0x2e, 0xb2, 0x32, 0xa0, 0x87, 0xea, 0x01, 0x89, 0x89, 0x84, 0x8b, 0x9c, 0x4a,
-	0x82, 0x27, 0xbd, 0x99, 0xf8, 0x00, 0xa6, 0xfa, 0x02, 0xdd, 0xa5, 0x0b, 0x4d, 0x4a, 0x8b, 0xdb,
-	0x72, 0xe0, 0xe2, 0xc1, 0x27, 0x37, 0xb4, 0x5b, 0xff, 0x9e, 0xe8, 0xcc, 0xf7, 0xcd, 0xe4, 0xf7,
-	0x0d, 0x90, 0x8e, 0x62, 0xea, 0xb8, 0xc4, 0xe3, 0x41, 0x19, 0x85, 0x4e, 0xec, 0x27, 0xbf, 0xe9,
-	0x94, 0xea, 0x04, 0xab, 0x6d, 0xb5, 0x9d, 0xf6, 0xb5, 0xe1, 0x03, 0xd3, 0x86, 0x0e, 0xa3, 0xf3,
-	0xe5, 0x57, 0x7f, 0x0d, 0x54, 0xce, 0x4e, 0x2a, 0x1f, 0x20, 0x7a, 0xe2, 0x1d, 0xd3, 0x06, 0x5d,
-	0x43, 0x4c, 0x45, 0xa7, 0x0e, 0xdc, 0xf4, 0x43, 0x16, 0x14, 0x41, 0x15, 0x93, 0xef, 0x06, 0x42,
-	0x10, 0xf6, 0x54, 0xf7, 0xd9, 0xaa, 0x08, 0xaa, 0x94, 0xd8, 0x77, 0xf9, 0x0e, 0xc9, 0xcb, 0x8e,
-	0x4a, 0xc2, 0xde, 0xa6, 0x65, 0xc1, 0x39, 0xac, 0x78, 0x7b, 0x9c, 0x5c, 0xf1, 0x16, 0xe5, 0x70,
-	0xba, 0xe7, 0x82, 0x49, 0x3a, 0x30, 0x3b, 0x16, 0x93, 0xaf, 0x7a, 0xd1, 0x84, 0xda, 0x51, 0xc3,
-	0x95, 0xcc, 0xd6, 0x4e, 0xf3, 0x35, 0xba, 0x85, 0x4d, 0x6b, 0x91, 0x74, 0x16, 0x16, 0xeb, 0x2a,
-	0x69, 0xce, 0x1c, 0x2b, 0x76, 0xa0, 0xc4, 0xab, 0xe5, 0x47, 0x00, 0xa9, 0x03, 0xd0, 0xa3, 0x92,
-	0x9a, 0x21, 0x0c, 0xe1, 0x12, 0xdd, 0x32, 0x24, 0x4d, 0x8e, 0x5d, 0x6c, 0xec, 0x63, 0xe3, 0x57,
-	0x7f, 0x17, 0x62, 0x7d, 0x4b, 0x28, 0x33, 0x8f, 0x9e, 0xce, 0xbe, 0x11, 0x86, 0x4d, 0xcb, 0x0c,
-	0xe5, 0x42, 0x5b, 0xb0, 0xa4, 0xb9, 0xfc, 0xb7, 0xe6, 0x51, 0xce, 0xc4, 0x9b, 0x9a, 0x7b, 0x88,
-	0x9e, 0xed, 0x3f, 0x41, 0x35, 0x84, 0x0b, 0x0d, 0x42, 0x47, 0xdc, 0x1f, 0xb7, 0xc9, 0x2f, 0x7e,
-	0xf5, 0x1c, 0xee, 0x36, 0xb2, 0xbd, 0xbb, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x73, 0x8f, 0xd3,
-	0xa6, 0xd5, 0x01, 0x00, 0x00,
+var fileDescriptor_plugin_487726b37a91bb4d = []byte{
+	// 339 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0xc1, 0x4b, 0xfb, 0x30,
+	0x14, 0xc7, 0xe9, 0xd6, 0x6d, 0xbf, 0xbd, 0xf6, 0x37, 0x21, 0x20, 0x94, 0x22, 0x3a, 0x7a, 0x71,
+	0xa7, 0x0e, 0xeb, 0x6d, 0x37, 0x61, 0x7f, 0x80, 0x44, 0xf1, 0x9e, 0x6d, 0x59, 0x17, 0x48, 0x93,
+	0xda, 0xa4, 0xa2, 0x17, 0xff, 0x6e, 0x8f, 0x92, 0x97, 0xd6, 0x55, 0xf0, 0xd4, 0x7c, 0xbf, 0x2f,
+	0xaf, 0xef, 0xf3, 0xcd, 0x83, 0xb8, 0x96, 0x6d, 0x29, 0x54, 0x5e, 0x37, 0xda, 0x6a, 0x32, 0xc1,
+	0x4f, 0x7a, 0x53, 0x6a, 0x5d, 0x4a, 0xbe, 0x46, 0xb5, 0x6b, 0x8f, 0x6b, 0x2b, 0x2a, 0x6e, 0x2c,
+	0xab, 0x6a, 0x7f, 0x2f, 0xdb, 0xc0, 0x74, 0x2b, 0x4a, 0x6e, 0x2c, 0xb9, 0x82, 0x39, 0x93, 0xa5,
+	0x6e, 0x84, 0x3d, 0x55, 0x49, 0xb0, 0x0c, 0x56, 0x73, 0x7a, 0x36, 0x08, 0x81, 0xf0, 0xc4, 0xcc,
+	0x29, 0x19, 0x2d, 0x83, 0x55, 0x4c, 0xf1, 0x9c, 0x7d, 0x42, 0xf4, 0xb4, 0x67, 0x8a, 0xf2, 0xd7,
+	0xd6, 0xfd, 0x60, 0x01, 0x23, 0x71, 0xe8, 0x3a, 0x47, 0xe2, 0x40, 0x52, 0xf8, 0x77, 0x14, 0x92,
+	0x2b, 0x56, 0x71, 0x6c, 0x9b, 0xd3, 0x1f, 0xed, 0x6a, 0x52, 0xef, 0x99, 0x15, 0x5a, 0x25, 0x63,
+	0x5f, 0xeb, 0x35, 0xb9, 0x85, 0xd9, 0x01, 0x91, 0x4c, 0x12, 0x2e, 0xc7, 0xab, 0xa8, 0xf8, 0xef,
+	0x59, 0x73, 0x0f, 0x4a, 0xfb, 0x6a, 0xf6, 0x15, 0xc0, 0xe2, 0xe1, 0xc5, 0x23, 0x98, 0x5a, 0x2b,
+	0xc3, 0x49, 0x0e, 0xa1, 0x4b, 0x88, 0x14, 0x51, 0x91, 0xe6, 0x3e, 0x7e, 0xde, 0xc7, 0xcf, 0x9f,
+	0xfb, 0xf8, 0x14, 0xef, 0xb9, 0x58, 0xf6, 0xa3, 0xee, 0xf9, 0xf0, 0x4c, 0x36, 0x30, 0x6d, 0xb8,
+	0x69, 0xa5, 0x45, 0xb2, 0xa8, 0xc8, 0xba, 0xf1, 0xbf, 0x47, 0x9d, 0x65, 0x2b, 0x2d, 0xed, 0x3a,
+	0xd2, 0x23, 0xc4, 0x43, 0xdf, 0x3d, 0x6a, 0xad, 0x8d, 0xb0, 0xe2, 0x8d, 0x1b, 0x84, 0x9a, 0xd0,
+	0xb3, 0x41, 0xae, 0x01, 0xac, 0xb6, 0x4c, 0xba, 0x06, 0x83, 0x0c, 0x13, 0x3a, 0x70, 0x48, 0x02,
+	0xb3, 0xbd, 0x56, 0x96, 0xbf, 0x7b, 0x94, 0x98, 0xf6, 0xb2, 0xd8, 0xc2, 0x85, 0x9f, 0xa3, 0x78,
+	0xf3, 0x88, 0x7b, 0x27, 0x77, 0x10, 0x3a, 0x83, 0x90, 0x0e, 0x77, 0xb0, 0x9a, 0xf4, 0xf2, 0xcf,
+	0x08, 0xbb, 0x29, 0xba, 0xf7, 0xdf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x54, 0x3c, 0x57, 0x9d, 0x3b,
+	0x02, 0x00, 0x00,
 }
